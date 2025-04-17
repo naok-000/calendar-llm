@@ -2,6 +2,7 @@ import sqlite3
 from faker import Faker
 import random
 from datetime import datetime, timedelta
+import argparse
 
 fake = Faker(['ja_JP'])
 
@@ -119,5 +120,21 @@ def seed_large_dataset(db_path="calendar.db", user_count=20, event_count=100):
     print("大量シードデータ投入完了！")
     conn.close()
 
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--basic", action="store_true", help="最小限のサンプルデータのみ投入")
+    parser.add_argument("--users", type=int, default=20)
+    parser.add_argument("--events", type=int, default=100)
+    args = parser.parse_args()
+
+    if args.basic:
+        conn = sqlite3.connect("calendar.db")
+        cursor = conn.cursor()
+        seed_basic_data(conn, cursor)
+        conn.close()
+        print("最小限のサンプルデータを投入しました。")
+    else:
+        seed_large_dataset(user_count=args.users, event_count=args.events)
+
 if __name__ == "__main__":
-    seed_large_dataset(user_count=30, event_count=200)
+    main()
